@@ -8,7 +8,7 @@ const nominationSchema = new mongoose.Schema({
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Student",
     required: true,
   },
   position: {

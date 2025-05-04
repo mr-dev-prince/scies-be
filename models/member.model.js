@@ -10,9 +10,13 @@ const memberSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  verified: {
+    type: Boolean,
+    default: false,
+  },
   student: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Student", 
+    ref: "Student",
     required: true,
   },
 });
@@ -20,4 +24,3 @@ const memberSchema = new mongoose.Schema({
 const Member = mongoose.model("Member", memberSchema);
 
 export default Member;
-    

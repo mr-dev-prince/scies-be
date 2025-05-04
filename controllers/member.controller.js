@@ -3,13 +3,13 @@ import Student from "../models/student.model.js";
 
 export const getAllMembers = async (req, res) => {
   try {
-    const members = await Member.find().populate(
+    const members = await Member.find({ verified: true }).populate(
       "student",
       "name email enrollmentNumber profileImg"
     );
     res.status(200).json(members);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching members" });
+    res.status(500).json({ message: "Error fetching verified members" });
   }
 };
 
@@ -55,5 +55,33 @@ export const deleteMember = async (req, res) => {
     res.status(200).json({ message: "Member deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Error deleting member" });
+  }
+};
+
+export const verifyMember = async (req, res) => {
+  const { memberId } = req.params;
+
+  try {
+    const member = await Member.findById(memberId);
+    if (!member) {
+      return res.status(404).json({ message: "Member not found" });
+    }
+    member.verified = true;
+    await member.save();
+    res.status(200).json({ message: "Member verified successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error verifying member" });
+  }
+};
+
+export const getUnVerifiedMembers = async (req, res) => {
+  try {
+    const unverifiedMembers = await Member.find({ verified: false }).populate(
+      "student",
+      "name email enrollmentNumber profileImg"
+    );
+    res.status(200).json({ unverifiedMembers });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching unverified members" });
   }
 };

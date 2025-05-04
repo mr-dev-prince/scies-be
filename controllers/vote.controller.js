@@ -1,8 +1,15 @@
 import Vote from "../models/vote.model.js";
+import Election from "../models/election.model.js";
 
 export const addVote = async (req, res) => {
   try {
     const { userId, electionId, position, candidateId } = req.body;
+
+    const election = await Election.findById(electionId);
+
+    if (election.startDate > new Date()) {
+      return res.status(400).json({ message: "Voting is not started yet." });
+    }
 
     const existingVote = await Vote.findOne({
       userId,
@@ -20,8 +27,10 @@ export const addVote = async (req, res) => {
       position,
       candidateId,
     });
+
     await newVote.save();
     res.status(201).json({ message: "Vote added successfully." });
+    
   } catch (error) {
     console.error("Error adding vote:", error);
     res.status(500).json({ message: "Internal server error." });
@@ -82,5 +91,3 @@ export const getVoteByCandidate = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
-
-

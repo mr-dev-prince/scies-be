@@ -29,10 +29,6 @@ const electionSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  endDate: {
-    type: Date,
-    required: true,
-  },
   positions: {
     type: [positionSchema],
     required: true,
