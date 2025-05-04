@@ -79,7 +79,7 @@ export const loginUser = async (req, res) => {
 
     if ((role === "admin" || role === "faculty") && !user.verified) {
       return res.status(400).json({
-        message: "You are not verified. Please contact C.E.O or Admin",
+        message: "You are not verified. Please contact Admin to get verified.",
       });
     }
 
