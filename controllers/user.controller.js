@@ -4,7 +4,17 @@ import bcrypt from "bcrypt";
 
 export const registerUser = async (req, res) => {
   const { name, email, password, role } = req.body;
+
   try {
+    if (role === "council") {
+      const existingStudent = await Student.findOne({ email });
+      if (!existingStudent) {
+        return res
+          .status(400)
+          .json({ message: "Only students can be council members" });
+      }
+    }
+
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
