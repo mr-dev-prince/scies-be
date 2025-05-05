@@ -9,9 +9,10 @@ export const registerUser = async (req, res) => {
     if (role === "council") {
       const existingStudent = await Student.findOne({ email });
       if (!existingStudent) {
-        return res
-          .status(400)
-          .json({ message: "Only students can be council members" });
+        return res.status(400).json({
+          message:
+            "Only students can be council members. Register as student first.",
+        });
       }
     }
 
@@ -212,3 +213,39 @@ export const verifyUser = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const removeProfileImg = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    user.profileImg = null;
+    await user.save();
+    res.status(200).json({ message: "Profile image removed successfully" });
+  }
+  catch (error) {
+    console.error("Error removing profile image:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+export const removeStudentProfileImg = async (req, res) => {
+  const { studentId } = req.params;
+
+  try {
+    const student = await Student.findById(studentId);
+    if (!student) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+    student.profileImg = null;
+    await student.save();
+    res.status(200).json({ message: "Profile image removed successfully" });
+  }
+  catch (error) {
+    console.error("Error removing profile image:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}

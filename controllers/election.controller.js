@@ -228,8 +228,6 @@ export const getAllElections = async (req, res) => {
       },
     ]);
 
-    console.log(elections);
-
     res.status(200).json({ elections });
   } catch (error) {
     console.error(

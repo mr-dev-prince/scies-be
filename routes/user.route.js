@@ -7,6 +7,8 @@ import {
   loginUser,
   registerStudent,
   registerUser,
+  removeProfileImg,
+  removeStudentProfileImg,
   verifyUser,
 } from "../controllers/user.controller.js";
 
@@ -20,5 +22,7 @@ router.post("/register-student", registerStudent);
 router.post("/login-student", loginStudent);
 router.put("/edit-student/:studentId", editStudent);
 router.post("/verify/:userId", verifyUser);
+router.post("/remove-profile-img/:userId", removeProfileImg);
+router.post("/remove-student-profile-img/:studentId", removeStudentProfileImg);
 
 export default router;

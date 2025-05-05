@@ -24,7 +24,6 @@ export const createContact = async (req, res) => {
 };
 
 export const getContacts = async (req, res) => {
-    console.log("1111");
   try {
     const contacts = await Contact.find();
     res.status(200).json(contacts);
