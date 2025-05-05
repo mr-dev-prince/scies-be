@@ -86,7 +86,7 @@ export const updateElection = async (req, res) => {
 
 export const deleteElection = async (req, res) => {
   try {
-    const electionId = req.params.id;
+    const electionId = req.params.electionId;
 
     const election = await Election.findByIdAndDelete(electionId);
 
