@@ -6,6 +6,7 @@ import eventRouter from "./routes/event.route.js";
 import electionRouter from "./routes/election.route.js";
 import nominationRouter from "./routes/nomination.route.js";
 import memberRouter from "./routes/member.route.js";
+import contactRouter from "./routes/contact.route.js";
 import voteRouter from "./routes/vote.route.js";
 import cors from "cors";
 import uploadImage from "./controllers/upload.controller.js";
@@ -27,6 +28,7 @@ app.use("/api/election", electionRouter);
 app.use("/api/nomination", nominationRouter);
 app.use("/api/vote", voteRouter);
 app.use("/api/member", memberRouter);
+app.use("/api/contact", contactRouter);
 app.use("/api/upload", upload.single("file"), uploadImage);
 
 //base route
