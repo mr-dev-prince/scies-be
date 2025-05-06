@@ -237,3 +237,156 @@ export const getAllElections = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+export const getElectionResults = async (req, res) => {
+  try {
+    const currentDate = new Date();
+
+    const completedElections = await Election.aggregate([
+      {
+        $match: {
+          startDate: { $lt: currentDate },
+        },
+      },
+      {
+        $lookup: {
+          from: "nominations",
+          localField: "_id",
+          foreignField: "electionId",
+          as: "nominations",
+        },
+      },
+      {
+        $addFields: {
+          nominations: {
+            $filter: {
+              input: "$nominations",
+              as: "nom",
+              cond: { $eq: ["$$nom.status", "accepted"] },
+            },
+          },
+        },
+      },
+      { $unwind: { path: "$nominations", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "students",
+          localField: "nominations.userId",
+          foreignField: "_id",
+          as: "student",
+        },
+      },
+      {
+        $addFields: {
+          "nominations.student": { $arrayElemAt: ["$student", 0] },
+        },
+      },
+      {
+        $lookup: {
+          from: "votes",
+          let: {
+            electionId: "$_id",
+            position: "$nominations.position",
+            candidateId: "$nominations.userId",
+          },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$electionId", "$$electionId"] },
+                    { $eq: ["$position", "$$position"] },
+                    { $eq: ["$candidateId", "$$candidateId"] },
+                  ],
+                },
+              },
+            },
+            { $count: "voteCount" },
+          ],
+          as: "voteData",
+        },
+      },
+      {
+        $addFields: {
+          "nominations.votes": {
+            $ifNull: [{ $arrayElemAt: ["$voteData.voteCount", 0] }, 0],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            electionId: "$_id",
+            position: "$nominations.position",
+          },
+          electionName: { $first: "$name" },
+          description: { $first: "$description" },
+          startDate: { $first: "$startDate" },
+          endDate: { $first: "$endDate" },
+          imageUrl: { $first: "$imageUrl" },
+          position: { $first: "$nominations.position" },
+          candidates: {
+            $push: {
+              $cond: {
+                if: { $eq: [{ $type: "$nominations._id" }, "missing"] },
+                then: "$$REMOVE",
+                else: {
+                  _id: "$nominations._id",
+                  userId: "$nominations.userId",
+                  votes: "$nominations.votes",
+                  createdAt: "$nominations.createdAt",
+                  student: {
+                    _id: "$nominations.student._id",
+                    name: "$nominations.student.name",
+                    email: "$nominations.student.email",
+                    enrollmentNumber: "$nominations.student.enrollmentNumber",
+                    profileImg: "$nominations.student.profileImg",
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.electionId",
+          name: { $first: "$electionName" },
+          description: { $first: "$description" },
+          startDate: { $first: "$startDate" },
+          endDate: { $first: "$endDate" },
+          imageUrl: { $first: "$imageUrl" },
+          results: {
+            $push: {
+              position: "$position",
+              candidates: "$candidates",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          electionId: "$_id",
+          name: 1,
+          description: 1,
+          startDate: 1,
+          endDate: 1,
+          imageUrl: 1,
+          results: 1,
+        },
+      },
+    ]);
+
+    if (completedElections.length === 0) {
+      return res.status(404).json({ message: "No completed elections found" });
+    }
+
+    return res.status(200).json(completedElections);
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Server error", error: error.message });
+  }
+};
