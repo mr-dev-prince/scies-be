@@ -1,4 +1,5 @@
 import Contact from "../models/contact.model.js";
+import sendEmail from "../utils/sendEmail.js";
 
 export const createContact = async (req, res) => {
   try {
@@ -16,6 +17,13 @@ export const createContact = async (req, res) => {
     });
 
     await newContact.save();
+
+    await sendEmail({
+      to: "sauravkumarmr.s@gmail.com",
+      subject: category,
+      text: `You have a new ${category} message from ${name} (${email}):\n\n ${message}`,
+    });
+
     res.status(201).json({ message: "Contact created successfully" });
   } catch (error) {
     console.error("Error creating contact:", error);

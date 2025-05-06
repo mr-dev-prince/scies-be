@@ -23,6 +23,14 @@ export const createMember = async (req, res) => {
       return res.status(400).json({ message: "Member already exists" });
     }
 
+    const existingPosition = await Member.findOne({ position });
+
+    if (existingPosition) {
+      return res
+        .status(400)
+        .json({ message: "Member for this position already exist" });
+    }
+
     const student = await Student.findOne({ enrollmentNumber });
 
     if (!student) {
