@@ -240,12 +240,13 @@ export const getAllElections = async (req, res) => {
 
 export const getElectionResults = async (req, res) => {
   try {
-    const currentDate = new Date();
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const completedElections = await Election.aggregate([
       {
         $match: {
-          startDate: { $lt: currentDate },
+          startDate: { $lt: today },
         },
       },
       {
