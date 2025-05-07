@@ -19,6 +19,11 @@ const contactSchema = new mongoose.Schema(
       enum: ["query", "grievances", "suggestion"],
       required: true,
     },
+    resolved: {
+      type: Number,
+      enum: [0, 1, 2], // 0: unresolved , 1: resolved, 2: in progress
+      default: 2,
+    },
   },
   {
     timestamps: true,

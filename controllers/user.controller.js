@@ -194,6 +194,21 @@ export const getUnverifiedUsers = async (req, res) => {
   }
 };
 
+export const deleteUser = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const verifyUser = async (req, res) => {
   const { userId } = req.params;
 
@@ -225,12 +240,11 @@ export const removeProfileImg = async (req, res) => {
     user.profileImg = null;
     await user.save();
     res.status(200).json({ message: "Profile image removed successfully" });
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error removing profile image:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
 export const removeStudentProfileImg = async (req, res) => {
   const { studentId } = req.params;
@@ -243,9 +257,8 @@ export const removeStudentProfileImg = async (req, res) => {
     student.profileImg = null;
     await student.save();
     res.status(200).json({ message: "Profile image removed successfully" });
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error removing profile image:", error);
     res.status(500).json({ message: "Internal server error" });
   }
-}
+};
