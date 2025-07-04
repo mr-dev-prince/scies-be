@@ -88,11 +88,15 @@ export const resolveContact = async (req, res) => {
       { new: true }
     );
 
-    await sendEmail({
-      to: contact.email,
-      subject: "Contact Form Submission",
-      text: `Dear ${contact.name},\n\nYour message has been resolved. Thank you for your patience.\n\nBest regards,\nSupport Team`,
-    });
+    try {
+      await sendEmail({
+        to: contact.email,
+        subject: "Contact Form Submission",
+        text: `Dear ${contact.name},\n\nYour message has been resolved. Thank you for your patience.\n\nBest regards,\nSupport Team`,
+      });
+    } catch (error) {
+      console.log("Failed to send email", error);
+    }
 
     if (!resolvedContact) {
       return res.status(404).json({ error: "Contact not found" });
@@ -122,11 +126,17 @@ export const rejectContact = async (req, res) => {
       { resolved: 0 },
       { new: true }
     );
-    await sendEmail({
-      to: contact.email,
-      subject: "Contact Form Submission",
-      text: `Dear ${contact.name},\n\nYour message has been rejected. Thank you for your understanding.\n\nBest regards,\nSupport Team`,
-    });
+
+    try {
+      await sendEmail({
+        to: contact.email,
+        subject: "Contact Form Submission",
+        text: `Dear ${contact.name},\n\nYour message has been rejected. Thank you for your understanding.\n\nBest regards,\nSupport Team`,
+      });
+    } catch (error) {
+      console.log("Failed to send email", error);
+    }
+
     if (!rejectedContact) {
       return res.status(404).json({ error: "Contact not found" });
     }
